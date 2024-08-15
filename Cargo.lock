@@ -1461,6 +1461,7 @@ checksum = "8f518f335dce6725a761382244631d86cf0ccb2863413590b31338feb467f9c3"
 [[package]]
 name = "iroh-base"
 version = "0.20.0"
+source = "git+https://github.com/n0-computer/iroh.git?branch=matheus23/iroh-net-wasm#34f4d48b20f4c59849c442259f28737d09f159e2"
 dependencies = [
  "aead",
  "anyhow",
@@ -1500,6 +1501,7 @@ dependencies = [
 [[package]]
 name = "iroh-metrics"
 version = "0.20.0"
+source = "git+https://github.com/n0-computer/iroh.git?branch=matheus23/iroh-net-wasm#34f4d48b20f4c59849c442259f28737d09f159e2"
 dependencies = [
  "anyhow",
  "erased_set",
@@ -1517,6 +1519,7 @@ dependencies = [
 [[package]]
 name = "iroh-net"
 version = "0.20.0"
+source = "git+https://github.com/n0-computer/iroh.git?branch=matheus23/iroh-net-wasm#34f4d48b20f4c59849c442259f28737d09f159e2"
 dependencies = [
  "anyhow",
  "backoff",

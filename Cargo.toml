@@ -17,7 +17,7 @@ console_error_panic_hook = "0.1.7"
 futures-lite = "2.3.0"
 getrandom = { version = "0.2.15", features = ["js"] }
 hex = "0.4.3"
-iroh-net = { path = "../iroh/iroh-net", default-features = false, features = ["wasm"] }
+iroh-net = { git = "https://github.com/n0-computer/iroh.git", branch = "matheus23/iroh-net-wasm", default-features = false, features = ["wasm"] }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 tracing-subscriber-wasm = "0.1.0"
