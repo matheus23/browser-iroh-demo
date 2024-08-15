@@ -1,0 +1,32 @@
+[package]
+name = "browser-iroh-net-demo"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[[example]]
+name = "serve-pong"
+path = "src/serve.rs"
+doc = false
+
+[dependencies]
+anyhow = "1.0.86"
+console_error_panic_hook = "0.1.7"
+futures-lite = "2.3.0"
+getrandom = { version = "0.2.15", features = ["js"] }
+hex = "0.4.3"
+iroh-net = { path = "../iroh/iroh-net", default-features = false, features = ["wasm"] }
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+tracing-subscriber-wasm = "0.1.0"
+wasm-bindgen = "0.2.92"
+wasm-bindgen-futures = "0.4.42"
+
+[dev-dependencies]
+tokio = { version = "1.38.1", features = ["full"] }
+
+[patch.crates-io]
+rustls = { git = "https://github.com/matheus23/rustls", branch = "0.21-wasm" }
+rustls-pki-types = { git = "https://github.com/Frando/rustls-pki-types", branch = "wasm-web" }

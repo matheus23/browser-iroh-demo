@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="./browser_iroh_net_demo.js" type="module"></script>
+    <script type="module">
+        import * as irohNetDemo from "./browser_iroh_net_demo.js"
+        console.log(irohNetDemo)
+
+        console.log("loading wasm")
+        const wasm = await irohNetDemo.default("./browser_iroh_net_demo_bg.wasm")
+        console.log("Wasm ready")
+        console.log(wasm)
+
+        window.wasm = irohNetDemo;
+    </script>
+</head>
+
+<body>
+    <h1>Hello, world!</h1>
+</body>
+
+</html>
