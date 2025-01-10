@@ -14,19 +14,24 @@ doc = false
 [dependencies]
 anyhow = "1.0.86"
 console_error_panic_hook = "0.1.7"
-futures-lite = "2.3.0"
+futures-lite = "2.5.0"
 getrandom = { version = "0.2.15", features = ["js"] }
 hex = "0.4.3"
-iroh-net = { git = "https://github.com/n0-computer/iroh.git", branch = "matheus23/iroh-net-wasm", default-features = false, features = ["wasm"] }
+iroh-relay = { git = "https://github.com/n0-computer/iroh.git", branch = "matheus23/iroh-relay-browser", default-features = false }
+iroh-base = { git = "https://github.com/n0-computer/iroh.git", branch = "matheus23/iroh-relay-browser" }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 tracing-subscriber-wasm = "0.1.0"
-wasm-bindgen = "0.2.92"
-wasm-bindgen-futures = "0.4.42"
+wasm-bindgen = "=0.2.99"
+wasm-bindgen-futures = "0.4"
+url = "2.5.4"
 
 [dev-dependencies]
 tokio = { version = "1.38.1", features = ["full"] }
 
 [patch.crates-io]
-rustls = { git = "https://github.com/matheus23/rustls", branch = "0.21-wasm" }
-rustls-pki-types = { git = "https://github.com/Frando/rustls-pki-types", branch = "wasm-web" }
+iroh-quinn = { git = "https://github.com/n0-computer/quinn.git", branch = "matheus23/browser" }
+iroh-quinn-proto = { git = "https://github.com/n0-computer/quinn.git", branch = "matheus23/browser" }
+iroh-quinn-udp = { git = "https://github.com/n0-computer/quinn.git", branch = "matheus23/browser" }
+
+iroh-metrics = { git = "https://github.com/n0-computer/iroh-metrics.git", branch = "main" }
