@@ -17,14 +17,16 @@ console_error_panic_hook = "0.1.7"
 futures-lite = "2.5.0"
 getrandom = { version = "0.2.15", features = ["js"] }
 hex = "0.4.3"
-iroh-relay = { git = "https://github.com/n0-computer/iroh.git", branch = "matheus23/iroh-relay-browser", default-features = false }
-iroh-base = { git = "https://github.com/n0-computer/iroh.git", branch = "matheus23/iroh-relay-browser" }
+iroh-relay = { path = "../iroh/iroh-relay", default-features = false }
+iroh-net-report = { path = "../iroh/iroh-net-report", default-features = false }
+iroh-base = { path = "../iroh/iroh-base" }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 tracing-subscriber-wasm = "0.1.0"
 wasm-bindgen = "=0.2.99"
 wasm-bindgen-futures = "0.4"
 url = "2.5.4"
+web-time = "*"
 
 [dev-dependencies]
 tokio = { version = "1.38.1", features = ["full"] }
@@ -33,5 +35,3 @@ tokio = { version = "1.38.1", features = ["full"] }
 iroh-quinn = { git = "https://github.com/n0-computer/quinn.git", branch = "matheus23/browser" }
 iroh-quinn-proto = { git = "https://github.com/n0-computer/quinn.git", branch = "matheus23/browser" }
 iroh-quinn-udp = { git = "https://github.com/n0-computer/quinn.git", branch = "matheus23/browser" }
-
-iroh-metrics = { git = "https://github.com/n0-computer/iroh-metrics.git", branch = "main" }
