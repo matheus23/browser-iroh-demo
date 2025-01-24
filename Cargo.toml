@@ -17,10 +17,7 @@ console_error_panic_hook = "0.1.7"
 futures-lite = "2.5.0"
 getrandom = { version = "0.2.15", features = ["js"] }
 hex = "0.4.3"
-iroh-relay = { git = "https://github.com/n0-computer/iroh.git", branch = "matheus23/iroh-browser", default-features = false }
-iroh-net-report = { git = "https://github.com/n0-computer/iroh.git", branch = "matheus23/iroh-browser", default-features = false }
-iroh-base = { git = "https://github.com/n0-computer/iroh.git", branch = "matheus23/iroh-browser" }
-iroh = { git = "https://github.com/n0-computer/iroh.git", branch = "matheus23/iroh-browser", default-features = false }
+iroh = { version = "0.31", default-features = false }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 tracing-subscriber-wasm = "0.1.0"
@@ -36,3 +33,12 @@ tokio = { version = "1.38.1", features = ["full"] }
 iroh-quinn = { git = "https://github.com/n0-computer/quinn.git", branch = "matheus23/browser" }
 iroh-quinn-proto = { git = "https://github.com/n0-computer/quinn.git", branch = "matheus23/browser" }
 iroh-quinn-udp = { git = "https://github.com/n0-computer/quinn.git", branch = "matheus23/browser" }
+iroh = { path = "../iroh/iroh" }
+
+[profile.release]
+codegen-units = 1
+strip = "symbols"
+debug = false
+lto = true
+opt-level = "z"
+panic = 'abort'
