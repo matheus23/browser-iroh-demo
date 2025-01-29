@@ -1,5 +1,4 @@
 use anyhow::Result;
-use browser_iroh_net_demo::serve_pongs;
 
 #[tokio::main]
 pub async fn main() -> Result<()> {

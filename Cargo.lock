@@ -249,7 +249,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "78a6932c88f1d2c29533a3b8a5f5a2f84cc19c3339b431677c3160c5c2e6ca85"
 
 [[package]]
-name = "browser-iroh-net-demo"
+name = "browser-iroh-demo"
 version = "0.1.0"
 dependencies = [
  "anyhow",
