@@ -94,7 +94,7 @@ pub async fn rust_accept() -> Result<()> {
     };
 
     let connection = connecting.await?;
-    let node_id = iroh::endpoint::get_remote_node_id(&connection)?;
+    let node_id = connection.remote_node_id()?;
     tracing::info!("accepted connection from {node_id}");
 
     let (mut send, mut recv) = connection.accept_bi().await?;
