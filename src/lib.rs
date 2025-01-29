@@ -1,16 +1,14 @@
-use std::str::FromStr;
-
 use anyhow::Result;
-use futures_lite::stream::StreamExt;
-use iroh_net::{ticket::NodeTicket, Endpoint};
+use iroh::NodeId;
+use std::str::FromStr;
 use tracing::level_filters::LevelFilter;
 use tracing_subscriber_wasm::MakeConsoleWriter;
-use wasm_bindgen::prelude::wasm_bindgen;
-
-const PING_ALPN: &[u8] = b"test/ping/0";
+use wasm_bindgen::{prelude::wasm_bindgen, JsError};
 
 #[wasm_bindgen(start)]
 fn start() {
+    console_error_panic_hook::set_once();
+
     tracing_subscriber::fmt()
         .with_max_level(LevelFilter::TRACE)
         .with_writer(
@@ -23,97 +21,92 @@ fn start() {
         .init();
 
     tracing::info!("(testing logging) Logging setup");
-
-    console_error_panic_hook::set_once();
 }
 
 #[wasm_bindgen]
-pub async fn do_a_ping_js(node_id: String) -> bool {
-    do_a_ping(node_id).await.unwrap();
-    true
+pub async fn connect(node_id: String) -> Result<(), JsError> {
+    rust_connect(node_id).await.map_err(|e| {
+        tracing::error!("Error occured: {e:#?}\n{:#?}", e.backtrace());
+        JsError::new(&e.to_string())
+    })
 }
 
 #[wasm_bindgen]
-pub async fn serve_pongs_js() {
-    serve_pongs().await.unwrap();
+pub async fn accept() -> Result<(), JsError> {
+    rust_accept().await.map_err(|e| {
+        tracing::error!("Error occured: {e:#?}\n{:#?}", e.backtrace());
+        JsError::new(&e.to_string())
+    })
 }
 
-pub async fn do_a_ping(ticket: String) -> Result<()> {
-    tracing::info!("do_a_ping()");
+const ECHO_ALPN: &[u8] = b"iroh-example/echo/0";
 
-    let endpoint = endpoint().await?;
+#[tracing::instrument]
+pub async fn rust_connect(node_id: String) -> Result<()> {
+    let endpoint = iroh::Endpoint::builder()
+        .discovery_n0()
+        .alpns(vec![ECHO_ALPN.to_vec()])
+        .bind()
+        .await?;
 
-    tracing::info!("Connecting to {ticket}");
+    let node_id = NodeId::from_str(&node_id)?;
 
-    let node_addr = NodeTicket::from_str(&ticket)?.node_addr().clone();
-
-    tracing::info!(?node_addr.info, "Got node info");
-
-    let conn = endpoint.connect(node_addr, &PING_ALPN).await?;
-    tracing::info!("Connected! Opening a channel.");
-
+    let conn = endpoint.connect(node_id, ECHO_ALPN).await?;
+    tracing::info!("Connected!");
     let (mut send, mut recv) = conn.open_bi().await?;
-    tracing::info!("Channel opened, sending ping");
 
-    let mut ping = vec![0u8; 8];
-    getrandom::getrandom(&mut ping)?;
+    send.write_all(b"Hello, world!").await?;
+    send.finish()?;
+    tracing::info!("Sent");
 
-    send.write_all(&ping).await?;
-    send.finish().await?;
-    tracing::info!("Sent ping. Waiting for response.");
-    let pong = recv.read_to_end(1000).await?;
+    let response = recv.read_to_end(1000).await?;
+    let resp_str = String::from_utf8_lossy(&response);
+    tracing::info!(?resp_str, "Received!");
 
-    if ping == pong {
-        tracing::info!("Received correct pong");
-    } else {
-        tracing::error!("Ping failed");
-    }
+    conn.close(0u32.into(), b"bye!");
+    conn.closed().await;
+
+    tracing::info!("Done :)");
+
+    endpoint.close().await;
 
     Ok(())
 }
 
-pub async fn endpoint() -> Result<Endpoint> {
-    Ok(Endpoint::builder()
-        .alpns(vec![PING_ALPN.to_vec()])
-        .bind(0)
-        .await?)
-}
+#[tracing::instrument]
+pub async fn rust_accept() -> Result<()> {
+    let endpoint = iroh::Endpoint::builder()
+        .discovery_n0()
+        .alpns(vec![ECHO_ALPN.to_vec()])
+        .bind()
+        .await?;
 
-pub async fn serve_pongs() -> Result<()> {
-    tracing::info!("serve_pongs()");
+    tracing::info!("Accepting connections at {}", endpoint.node_id());
 
-    let endpoint = endpoint().await?;
-
-    tracing::info!("Waiting for home relay");
-    let relay = endpoint.watch_home_relay().next().await;
-    tracing::info!(?relay, "Got home relay");
-
-    let ticket = NodeTicket::new(endpoint.node_addr())?.to_string();
-
-    tracing::info!("Node address: {}", ticket);
-
-    while let Some(mut connecting) = endpoint.accept().await {
-        tracing::info!("Incoming connection");
-        match connecting.alpn().await?.as_ref() {
-            PING_ALPN => {
-                let conn = connecting.await?;
-
-                let node_id = iroh_net::endpoint::get_remote_node_id(&conn)?;
-                tracing::info!("Connection from {node_id}. Waiting for stream.");
-
-                let (mut send, mut recv) = conn.accept_bi().await?;
-                tracing::info!("Stream opened. Reading ping.");
-                let ping = recv.read_to_end(1000).await?;
-                tracing::info!("Got ping {}", hex::encode(&ping));
-                send.write_all(&ping).await?;
-                send.finish().await?;
-                tracing::info!("Sent pong back");
-            }
-            unknown => tracing::warn!("Unknown ALPN: {}", String::from_utf8_lossy(unknown)),
+    let connecting = loop {
+        let Some(incoming) = endpoint.accept().await else {
+            return Ok(());
+        };
+        if let Ok(connecting) = incoming.accept() {
+            break connecting;
         }
-    }
+        tracing::info!("Ignoring incoming connection");
+    };
 
-    tracing::info!("Closing endpoint.");
+    let connection = connecting.await?;
+    let node_id = connection.remote_node_id()?;
+    tracing::info!("accepted connection from {node_id}");
+
+    let (mut send, mut recv) = connection.accept_bi().await?;
+    let mut bytes_sent = 0;
+    while let Some(chunk) = recv.read_chunk(10_000, true).await? {
+        bytes_sent += chunk.bytes.len();
+        send.write_chunk(chunk.bytes).await?;
+    }
+    send.finish()?;
+    tracing::info!("Copied over {bytes_sent} byte(s)");
+
+    connection.closed().await;
 
     Ok(())
 }

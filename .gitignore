@@ -1,2 +1,6 @@
-/node_modules
-/target
+public/*.d.ts
+public/*.js
+public/*.wasm
+public/*.wasm.d.ts
+node_modules/
+target/

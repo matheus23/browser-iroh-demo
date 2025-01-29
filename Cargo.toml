@@ -14,19 +14,25 @@ doc = false
 [dependencies]
 anyhow = "1.0.86"
 console_error_panic_hook = "0.1.7"
-futures-lite = "2.3.0"
+futures-lite = "2.5.0"
 getrandom = { version = "0.2.15", features = ["js"] }
 hex = "0.4.3"
-iroh-net = { git = "https://github.com/n0-computer/iroh.git", branch = "matheus23/iroh-net-wasm", default-features = false, features = ["wasm"] }
+iroh = { git = "https://github.com/n0-computer/iroh.git", branch = "matheus23/iroh-browser", version = "0.31", default-features = false }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 tracing-subscriber-wasm = "0.1.0"
-wasm-bindgen = "0.2.92"
-wasm-bindgen-futures = "0.4.42"
+wasm-bindgen = "=0.2.100"
+wasm-bindgen-futures = "0.4"
+url = "2.5.4"
+web-time = "*"
 
 [dev-dependencies]
 tokio = { version = "1.38.1", features = ["full"] }
 
-[patch.crates-io]
-rustls = { git = "https://github.com/matheus23/rustls", branch = "0.21-wasm" }
-rustls-pki-types = { git = "https://github.com/Frando/rustls-pki-types", branch = "wasm-web" }
+[profile.release]
+codegen-units = 1
+strip = "symbols"
+debug = false
+lto = true
+opt-level = "z"
+panic = 'abort'
