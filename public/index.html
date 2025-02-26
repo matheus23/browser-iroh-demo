@@ -2,17 +2,17 @@
 <html>
 
 <head>
-    <script src="./browser_iroh_net_demo.js" type="module"></script>
+    <script src="./browser_iroh_demo.js" type="module"></script>
     <script type="module">
-        import * as irohNetDemo from "./browser_iroh_net_demo.js"
-        console.log(irohNetDemo)
+        import * as irohDemo from "./browser_iroh_demo.js"
+        console.log(irohDemo)
 
         console.log("loading wasm")
-        const wasm = await irohNetDemo.default("./browser_iroh_net_demo_bg.wasm")
+        const wasm = await irohDemo.default("./browser_iroh_demo_bg.wasm")
         console.log("Wasm ready")
         console.log(wasm)
 
-        window.wasm = irohNetDemo;
+        window.wasm = irohDemo;
     </script>
 </head>
 
