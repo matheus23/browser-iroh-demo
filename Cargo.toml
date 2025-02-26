@@ -12,7 +12,7 @@ console_error_panic_hook = "0.1.7"
 futures-lite = "2.5.0"
 getrandom = { version = "0.3", features = ["wasm_js"] }
 hex = "0.4.3"
-iroh = { git = "https://github.com/n0-computer/iroh.git", branch = "main", default-features = false }
+iroh = { version = "0.33", default-features = false }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 tracing-subscriber-wasm = "0.1.0"
